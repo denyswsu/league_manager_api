@@ -19,13 +19,13 @@ Owner can also manage the website settings, such as:
 - etc.
 
 ## TODO:
-- [ ] Dockerize the project
+- [x] Dockerize the project
+- [ ] Implement websocket functionality (e.g chat, live scores, etc.)
 - [ ] Add CI/CD
 - [ ] Add tests
 - [ ] Host the project on AWS
 - [ ] Implement basic tenant creation MVP (multi-tenancy)
 - [ ] Implement basic league management functionality
-- [ ] Implement websocket functionality (e.g chat, live scores, etc.)
 
 ## Extra TODO:
 - [ ] Team management functionality (admins manage their teams, add players, etc.)
