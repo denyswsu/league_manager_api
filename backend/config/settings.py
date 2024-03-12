@@ -56,7 +56,7 @@ MIDDLEWARE = [
     "apps.core.profiling.ProfilingMiddleware",
 ]
 
-ROOT_URLCONF = 'league_manager_api.urls'
+ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
     {
@@ -74,7 +74,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'league_manager_api.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 AUTH_USER_MODEL = 'users.User'
 
