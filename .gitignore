@@ -155,4 +155,4 @@ cython_debug/
 .idea/
 
 dev_db_data/
-```
+staticfiles/
