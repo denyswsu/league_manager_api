@@ -1,7 +1,6 @@
 from django.db import transaction
 from django.db.models import OuterRef, Exists, Count
-from django.utils import timezone
-from rest_framework import viewsets, status
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.generics import ListCreateAPIView, get_object_or_404
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
@@ -10,11 +9,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
+from apps.chat.constants import USER_LEFT, USER_JOINED, MESSAGE_ADDED
 from apps.chat.mixins import CentrifugoMixin
 from apps.chat.models import RoomMember, Room, Message
 from apps.chat.serializers import (
     RoomSearchSerializer, RoomSerializer, MessageSerializer, RoomMemberSerializer,
 )
+from apps.chat.services import get_room_member_channels
 
 
 class RoomListViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
@@ -69,7 +70,7 @@ class MessageListCreateAPIView(ListCreateAPIView, CentrifugoMixin):
         room_id = self.kwargs['room_id']
         room = Room.objects.select_for_update().get(id=room_id)
         room.increment_version()
-        channels = self.get_room_member_channels(room_id)
+        channels = get_room_member_channels(room_id)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         obj = serializer.save(room=room, user=request.user)
@@ -80,12 +81,12 @@ class MessageListCreateAPIView(ListCreateAPIView, CentrifugoMixin):
         broadcast_payload = {
             'channels': channels,
             'data': {
-                'type': 'message_added',
+                'type': MESSAGE_ADDED,
                 'body': serializer.data
             },
             'idempotency_key': f'message_{serializer.data["id"]}'
         }
-        self.broadcast_room(room_id, broadcast_payload)
+        self.broadcast_to_room(broadcast_payload)
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -96,21 +97,25 @@ class JoinRoomView(APIView, CentrifugoMixin):
 
     @transaction.atomic
     def post(self, request, room_id):
-        # Some code skipped here ....
+        room = Room.objects.select_for_update().get(id=room_id)
+        room.increment_version()
+        if RoomMember.objects.filter(user=request.user, room=room).exists():
+            return Response({"message": "already a member"}, status=status.HTTP_409_CONFLICT)
+
         obj, _ = RoomMember.objects.get_or_create(user=request.user, room=room)
-        channels = self.get_room_member_channels(room_id)
+        channels = get_room_member_channels(room_id)
         obj.room.member_count = len(channels)
         body = RoomMemberSerializer(obj).data
 
         broadcast_payload = {
             'channels': channels,
             'data': {
-                'type': 'user_joined',
+                'type': USER_JOINED,
                 'body': body
             },
             'idempotency_key': f'user_joined_{obj.pk}'
         }
-        self.broadcast_room(room_id, broadcast_payload)
+        self.broadcast_to_room(broadcast_payload)
         return Response(body, status=status.HTTP_200_OK)
 
 
@@ -121,7 +126,7 @@ class LeaveRoomView(APIView, CentrifugoMixin):
     def post(self, request, room_id):
         room = Room.objects.select_for_update().get(id=room_id)
         room.increment_version()
-        channels = self.get_room_member_channels(room_id)
+        channels = get_room_member_channels(room_id)
         obj = get_object_or_404(RoomMember, user=request.user, room=room)
         obj.room.member_count = len(channels) - 1
         pk = obj.pk
@@ -131,10 +136,10 @@ class LeaveRoomView(APIView, CentrifugoMixin):
         broadcast_payload = {
             'channels': channels,
             'data': {
-                'type': 'user_left',
+                'type': USER_LEFT,
                 'body': body
             },
             'idempotency_key': f'user_left_{pk}'
         }
-        self.broadcast_room(room_id, broadcast_payload)
+        self.broadcast_to_room(broadcast_payload)
         return Response(body, status=status.HTTP_200_OK)
