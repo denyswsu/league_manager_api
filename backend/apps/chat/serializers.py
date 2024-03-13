@@ -12,7 +12,7 @@ class RoomSearchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Room
-        fields = ['id', 'name', 'created_at', 'updated_at', 'is_member']
+        fields = ['id', 'name', 'created_at', 'bumped_at', 'is_member']
 
 
 class UserSerializer(serializers.ModelSerializer):

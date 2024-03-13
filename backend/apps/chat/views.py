@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.db.models import OuterRef, Exists, Count
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import ListCreateAPIView, get_object_or_404
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
@@ -18,40 +18,47 @@ from apps.chat.serializers import (
 from apps.chat.services import get_room_member_channels
 
 
-class RoomListViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
+class RoomSearchViewSet(viewsets.ModelViewSet):
+    serializer_class = RoomSearchSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        user_membership = RoomMember.objects.filter(
+            room=OuterRef('pk'),
+            user=user
+        )
+        return Room.objects.annotate(
+            is_member=Exists(user_membership)
+        ).order_by('name')
+
+
+class RoomListViewSet(ListModelMixin, GenericViewSet):
     serializer_class = RoomSerializer
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
-        if self.action == 'search':
-            return RoomSearchSerializer
         return RoomSerializer
 
     def get_queryset(self):
-        user = self.request.user
-        if self.action == 'search':
-            user_membership = RoomMember.objects.filter(
-                room=OuterRef('pk'),
-                user=user
-            )
-            return Room.objects.annotate(
-                is_member=Exists(user_membership)
-            ).order_by('name')
-
-        else:
-            queryset = Room.objects.annotate(
-                member_count=Count('memberships')
-            ).filter(
-                memberships__user_id=user.pk
-            ).prefetch_related(
-                'last_message', 'last_message__user'
-            ).order_by('-memberships__joined_at')
-
+        queryset = Room.objects.annotate(
+            member_count=Count('memberships')
+        ).filter(
+            memberships__user_id=self.request.user.pk
+        ).prefetch_related(
+            'last_message', 'last_message__user'
+        ).order_by('-memberships__joined_at')
         return queryset
 
-    @action(detail=False, methods=['get'], url_path='search', url_name='search')
-    def search(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+
+class RoomDetailViewSet(RetrieveModelMixin, GenericViewSet):
+    serializer_class = RoomSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Room.objects.annotate(
+            member_count=Count('memberships')
+        ).filter(memberships__user_id=self.request.user.pk)
 
 
 class MessageListCreateAPIView(ListCreateAPIView, CentrifugoMixin):

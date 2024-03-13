@@ -12,6 +12,9 @@ def broadcast(broadcast_payload: dict):
     Using Centrifugo HTTP API is the simplest way to send real-time message, and usually
     it provides the best latency. The trade-off here is that error here may result in
     lost real-time event. Depending on the application requirements this may be fine or not.
+    Publishing directly over the Centrifugo API usually allows achieving the best delivery
+    latency, according to the Centrifugo documentation:
+    https://centrifugal.dev/docs/tutorial/outbox_cdc
 
     params:
     @broadcast_payload: A dictionary containing the data to be broadcasted.

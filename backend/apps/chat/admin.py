@@ -5,7 +5,7 @@ from apps.chat.models import Room, RoomMember, Message
 
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ('name', 'version', 'created_at', 'bumped_at', 'last_message')
+    list_display = ('id', 'name', 'version', 'created_at', 'bumped_at', 'last_message')
     search_fields = ('name',)
 
 
