@@ -67,6 +67,7 @@ class MessageListCreateAPIView(ListCreateAPIView, CentrifugoMixin):
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
+        # TODO: move out all the logic to a service
         room_id = self.kwargs['room_id']
         room = Room.objects.select_for_update().get(id=room_id)
         room.increment_version()
@@ -84,7 +85,7 @@ class MessageListCreateAPIView(ListCreateAPIView, CentrifugoMixin):
                 'type': MESSAGE_ADDED,
                 'body': serializer.data
             },
-            'idempotency_key': f'message_{serializer.data["id"]}'
+            'idempotency_key': f'{MESSAGE_ADDED}_{serializer.data["id"]}'
         }
         self.broadcast_to_room(broadcast_payload)
 
@@ -97,6 +98,7 @@ class JoinRoomView(APIView, CentrifugoMixin):
 
     @transaction.atomic
     def post(self, request, room_id):
+        # TODO: move out all the logic to a service
         room = Room.objects.select_for_update().get(id=room_id)
         room.increment_version()
         if RoomMember.objects.filter(user=request.user, room=room).exists():
@@ -113,7 +115,7 @@ class JoinRoomView(APIView, CentrifugoMixin):
                 'type': USER_JOINED,
                 'body': body
             },
-            'idempotency_key': f'user_joined_{obj.pk}'
+            'idempotency_key': f'{USER_JOINED}_{obj.pk}'
         }
         self.broadcast_to_room(broadcast_payload)
         return Response(body, status=status.HTTP_200_OK)
@@ -124,6 +126,7 @@ class LeaveRoomView(APIView, CentrifugoMixin):
 
     @transaction.atomic
     def post(self, request, room_id):
+        # TODO: move out all the logic to a service
         room = Room.objects.select_for_update().get(id=room_id)
         room.increment_version()
         channels = get_room_member_channels(room_id)
@@ -139,7 +142,7 @@ class LeaveRoomView(APIView, CentrifugoMixin):
                 'type': USER_LEFT,
                 'body': body
             },
-            'idempotency_key': f'user_left_{pk}'
+            'idempotency_key': f'{USER_LEFT}_{pk}'
         }
         self.broadcast_to_room(broadcast_payload)
         return Response(body, status=status.HTTP_200_OK)

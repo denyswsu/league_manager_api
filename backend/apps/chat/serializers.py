@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from apps.chat.constants import ALL_MESSAGE_TYPES
 from apps.chat.models import Room, Message, RoomMember
 
 User = get_user_model()
@@ -62,3 +63,24 @@ class RoomMemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = RoomMember
         fields = ['room', 'user']
+
+
+class BroadcastData(serializers.Serializer):
+    type = serializers.ChoiceField(choices=ALL_MESSAGE_TYPES)
+    body = serializers.DictField()
+
+
+class BroadcastPayload(serializers.Serializer):
+    """
+    data = {
+        'channels': channels,  # A list of channels to broadcast the message to.
+        'data': {
+            'type': 'user_left',  # The type of the message.
+            'body': body  # The data to be broadcast.
+        },
+        'idempotency_key': f'user_left_{pk}'  # A unique key to prevent duplicate messages.
+    }
+    """
+    channels = serializers.ListField(child=serializers.CharField())
+    idempotency_key = serializers.CharField()
+    data = BroadcastData()

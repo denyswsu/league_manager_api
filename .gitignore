@@ -156,3 +156,4 @@ cython_debug/
 
 dev_db_data/
 staticfiles/
+media/

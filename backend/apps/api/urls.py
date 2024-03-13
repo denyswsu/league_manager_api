@@ -1,5 +1,4 @@
 from django.urls import path, include
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from apps.users import views as users_views
 
@@ -14,4 +13,3 @@ urlpatterns = [
     path('logout/', users_views.logout_view, name='api-logout'),
 ]
 
-urlpatterns += staticfiles_urlpatterns()

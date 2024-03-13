@@ -14,22 +14,22 @@ def broadcast(broadcast_payload: dict):
     lost real-time event. Depending on the application requirements this may be fine or not.
 
     params:
-    - broadcast_payload: A dictionary containing the data to be broadcasted.
-        {
-            'channels': channels,  # A list of channels to broadcast the message to.
-            'data': {
-                'type': 'user_left',  # The type of the message.
-                'body': body  # The data to be broadcast.
-            },
-            'idempotency_key': f'user_left_{pk}'  # A unique key to prevent duplicate messages.
-        }
+    @broadcast_payload: A dictionary containing the data to be broadcasted.
+    >>> {
+    >>>     'channels': [...],  # A list of channels to broadcast the message to.
+    >>>     'data': {
+    >>>         'type': 'defined_message_type',  # The type of the message.
+    >>>         'body': {...}  # The data to be broadcast.
+    >>>     },
+    >>>     'idempotency_key': 'unique_key'  # A unique key to prevent duplicate messages.
+    >>> }
     """
     session = requests.Session()
     retries = Retry(total=1, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
     session.mount('http://', HTTPAdapter(max_retries=retries))
     try:
         session.post(
-            "http://centrifugo:8000/api/broadcast",
+            f"{settings.CENTRIFUGO_HTTP_API_URL}/api/broadcast",
             data=json.dumps(broadcast_payload),
             headers={
                 'Content-type': 'application/json',
