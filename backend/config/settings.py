@@ -2,6 +2,8 @@ import os
 import sys
 from pathlib import Path
 
+from config.utils import get_env_variable
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -13,13 +15,13 @@ sys.path.insert(0, APPS_DIR)
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = get_env_variable("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", False)
-DEBUG_SQL = os.getenv("DEBUG_SQL", False)
+DEBUG = get_env_variable("DEBUG", False)
+DEBUG_SQL = get_env_variable("DEBUG_SQL", False)
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(",")
+ALLOWED_HOSTS = get_env_variable("DJANGO_ALLOWED_HOSTS").split(",")
 
 
 # Application definition
@@ -40,7 +42,8 @@ INSTALLED_APPS = [
     'drf_yasg',
 
     # project apps
-    'apps.users.apps.UsersConfig',
+    'users',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -86,11 +89,11 @@ AUTH_USER_MODEL = 'users.User'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("POSTGRES_DB"),
-        "USER": os.getenv("POSTGRES_USER"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT"),
+        "NAME": get_env_variable("POSTGRES_DB"),
+        "USER": get_env_variable("POSTGRES_USER"),
+        "PASSWORD": get_env_variable("POSTGRES_PASSWORD"),
+        "HOST": get_env_variable("DB_HOST"),
+        "PORT": get_env_variable("DB_PORT"),
     }
 }
 
@@ -151,3 +154,8 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 10,
 }
+
+
+# Centrifugo settings
+CENTRIFUGO_TOKEN_SECRET = get_env_variable("CENTRIFUGO_TOKEN_SECRET")
+CENTRIFUGO_HTTP_API_KEY = get_env_variable("CENTRIFUGO_HTTP_API_KEY")
