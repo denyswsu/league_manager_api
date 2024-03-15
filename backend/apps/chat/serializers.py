@@ -7,14 +7,6 @@ from apps.chat.models import Room, Message, RoomMember
 User = get_user_model()
 
 
-class RoomSearchSerializer(serializers.ModelSerializer):
-    is_member = serializers.BooleanField(read_only=True)
-
-    class Meta:
-        model = Room
-        fields = ['id', 'name', 'created_at', 'bumped_at', 'is_member']
-
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -38,13 +30,21 @@ class RoomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Room
-        fields = ['id', 'name', 'version', 'member_count', 'last_message']
+        fields = ['id', 'name', 'version', 'member_count', 'last_message', 'bumped_at']
+
+
+class RoomSearchSerializer(serializers.ModelSerializer):
+    is_member = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = Room
+        fields = ['id', 'name', 'created_at', 'bumped_at', 'is_member']
 
 
 class MessageRoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ['id', 'version']
+        fields = ['id', 'version', 'bumped_at']
 
 
 class MessageSerializer(serializers.ModelSerializer):

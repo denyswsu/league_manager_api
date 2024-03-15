@@ -8,7 +8,7 @@ from apps.chat.services import broadcast
 
 class CentrifugoMixin:
     @staticmethod
-    def broadcast_to_room(broadcast_payload):
+    def broadcast_to_room(broadcast_payload: dict):
         """
         Validate broadcast payload and send a broadcast message to all members of the room.
         We need to use on_commit here to not send notification to Centrifugo before
