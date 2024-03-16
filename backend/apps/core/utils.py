@@ -23,9 +23,13 @@ def log_db_queries(f):
         print("-" * 80)
         print("db queries log for %s:\n" % f.__name__)
         print("TOTAL COUNT: %s" % len(connection.queries))
-        print("TOTAL TIME:  %s\n" % reduce(lambda x, y: x + float(y["time"]), connection.queries, 0.0))
+        print(
+            "TOTAL TIME:  %s\n"
+            % reduce(lambda x, y: x + float(y["time"]), connection.queries, 0.0)
+        )
         for q in connection.queries:
             print("%s:  %s\n" % (q["time"], q["sql"]))
         print("-" * 80)
         return res
+
     return new_f

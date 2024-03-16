@@ -8,7 +8,9 @@ def terminal_width():
     """Function to compute the terminal width."""
     width = 0
     try:
-        import struct, fcntl, termios
+        import fcntl
+        import struct
+        import termios
 
         s = struct.pack("HHHH", 0, 0, 0, 0)
         x = fcntl.ioctl(1, termios.TIOCGWINSZ, s)
@@ -33,8 +35,10 @@ class ProfilingMiddleware(object):
     def __init__(self, get_response):
         self.get_response = get_response
         if settings.DEBUG and not settings.DEBUG_SQL:
-            print("INFO: SQL_DEBUG disabled to enable it make sure both DEBUG_SQL and DEBUG are set to True in the "
-                  "appropriate environment settings file.")
+            print(
+                "INFO: SQL_DEBUG disabled to enable it make sure both DEBUG_SQL and DEBUG are set to True in the "
+                "appropriate environment settings file."
+            )
 
     def __call__(self, request):
         response = self.get_response(request)
@@ -48,7 +52,7 @@ class ProfilingMiddleware(object):
                 total_time = total_time + float(query["time"])
                 while len(sql) > width - indentation:
                     print("%s%s" % (" " * indentation, sql[: width - indentation]))
-                    sql = sql[width - indentation:]
+                    sql = sql[width - indentation :]
                 print("%s%s\n" % (" " * indentation, sql))
             replace_tuple = (
                 " " * indentation,

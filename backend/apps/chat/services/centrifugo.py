@@ -1,10 +1,9 @@
 import json
-
-import requests
-from requests.adapters import HTTPAdapter, Retry
 import logging
 
+import requests
 from django.conf import settings
+from requests.adapters import HTTPAdapter, Retry
 
 
 def broadcast(broadcast_payload: dict):
@@ -29,16 +28,16 @@ def broadcast(broadcast_payload: dict):
     """
     session = requests.Session()
     retries = Retry(total=1, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
-    session.mount('http://', HTTPAdapter(max_retries=retries))
+    session.mount("http://", HTTPAdapter(max_retries=retries))
     try:
         session.post(
             f"{settings.CENTRIFUGO_HTTP_API_URL}/api/broadcast",
             data=json.dumps(broadcast_payload),
             headers={
-                'Content-type': 'application/json',
-                'X-API-Key': settings.CENTRIFUGO_HTTP_API_KEY,
-                'X-Centrifugo-Error-Mode': 'transport'
-            }
+                "Content-type": "application/json",
+                "X-API-Key": settings.CENTRIFUGO_HTTP_API_KEY,
+                "X-Centrifugo-Error-Mode": "transport",
+            },
         )
     except requests.exceptions.RequestException as e:
         logging.error(e)

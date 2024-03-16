@@ -2,8 +2,14 @@
 import os
 import sys
 
+import dotenv
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 if __name__ == "__main__":
+    dotenv.read_dotenv(f"{BASE_DIR}/env_files/.env")
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
     try:
         from django.core.management import execute_from_command_line

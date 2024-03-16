@@ -1,9 +1,8 @@
 from functools import partial
 
-from django.db import transaction
-
 from apps.chat.serializers import BroadcastPayload
 from apps.chat.services import broadcast
+from django.db import transaction
 
 
 class CentrifugoMixin:

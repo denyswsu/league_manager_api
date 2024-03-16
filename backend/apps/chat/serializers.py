@@ -1,8 +1,7 @@
+from apps.chat.constants import ALL_MESSAGE_TYPES
+from apps.chat.models import Message, Room, RoomMember
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-
-from apps.chat.constants import ALL_MESSAGE_TYPES
-from apps.chat.models import Room, Message, RoomMember
 
 User = get_user_model()
 
@@ -10,7 +9,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username']
+        fields = ["id", "username"]
 
 
 class LastMessageSerializer(serializers.ModelSerializer):
@@ -18,7 +17,7 @@ class LastMessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['id', 'content', 'user', 'created_at']
+        fields = ["id", "content", "user", "created_at"]
 
 
 class RoomSerializer(serializers.ModelSerializer):
@@ -30,7 +29,7 @@ class RoomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Room
-        fields = ['id', 'name', 'version', 'member_count', 'last_message', 'bumped_at']
+        fields = ["id", "name", "version", "member_count", "last_message", "bumped_at"]
 
 
 class RoomSearchSerializer(serializers.ModelSerializer):
@@ -38,13 +37,13 @@ class RoomSearchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Room
-        fields = ['id', 'name', 'created_at', 'bumped_at', 'is_member']
+        fields = ["id", "name", "created_at", "bumped_at", "is_member"]
 
 
 class MessageRoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ['id', 'version', 'bumped_at']
+        fields = ["id", "version", "bumped_at"]
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -53,7 +52,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['id', 'content', 'user', 'room', 'created_at']
+        fields = ["id", "content", "user", "room", "created_at"]
 
 
 class RoomMemberSerializer(serializers.ModelSerializer):
@@ -62,7 +61,7 @@ class RoomMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RoomMember
-        fields = ['room', 'user']
+        fields = ["room", "user"]
 
 
 class BroadcastData(serializers.Serializer):
@@ -81,6 +80,7 @@ class BroadcastPayload(serializers.Serializer):
         'idempotency_key': f'user_left_{pk}'  # A unique key to prevent duplicate messages.
     }
     """
+
     channels = serializers.ListField(child=serializers.CharField())
     idempotency_key = serializers.CharField()
     data = BroadcastData()

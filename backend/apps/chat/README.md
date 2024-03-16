@@ -1,5 +1,5 @@
 # Chat app that uses Centrifugo
-WebSocket connection here is mono-directional, e.g. we send ws message to clients 
+WebSocket connection here is mono-directional, e.g. we send ws message to clients
 via Centrifugo HTTP broadcast API (like push notifications).
 Front-end sends chat messages via DRF HTTP API directly.
 
