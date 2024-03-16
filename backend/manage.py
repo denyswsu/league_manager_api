@@ -8,7 +8,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 if __name__ == "__main__":
-    dotenv.read_dotenv(f"{BASE_DIR}/env_files/.env")
+    if not os.environ.get("IS_DOCKER"):
+        dotenv.read_dotenv(f"{BASE_DIR}/env_files/.env")
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
     try:

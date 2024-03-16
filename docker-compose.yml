@@ -1,6 +1,19 @@
 version: "3.9"
 
 services:
+  nginx:
+    container_name: nginx
+    restart: always
+    build: ./nginx
+    ports:
+      - "1337:80"
+    volumes:
+      - static_volume:/usr/src/app/staticfiles/
+      - media_volume:/usr/src/app/media/
+    depends_on:
+      - wsgiserver
+      - asgiserver
+
   db:
     container_name: db
     image: postgres:15.3-bullseye
@@ -18,51 +31,50 @@ services:
     ports:
       - "5432:5432"
 
-  backend:
-    container_name: backend
+  wsgiserver:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: wsgiserver
+    entrypoint: ["bash", "/usr/src/backend/entrypoint-wsgi.sh"]
+#    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
     env_file:
       - ./env_files/.env.dev
-    entrypoint: ["bash", "/usr/src/backend/entrypoint-dev.sh"]
     volumes:
       - ./backend:/usr/src/backend
+      - static_volume:/usr/src/app/staticfiles/
+      - media_volume:/usr/src/app/media/
+    links:
+      - db
+      - redis
     expose:
       - 8000
-    depends_on:
-      db:
-        condition: service_healthy
-    ports:
-      - "8000:8000"
 
-  frontend:
-    container_name: frontend
-    stdin_open: true
-    build: ./frontend
+  asgiserver:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: asgiserver
+    entrypoint: ["bash", "/usr/src/backend/entrypoint-asgi.sh"]
+#    command: daphne config.asgi:application -b 0.0.0.0 -p 9000
+    env_file:
+      - ./env_files/.env.dev
     volumes:
-      - ./frontend:/usr/src/app
-      - /usr/src/app/node_modules
+      - ./backend:/usr/src/backend
+    links:
+      - db
+      - redis
     expose:
-      - 5173
-    environment:
-      - NODE_ENV=development
-    depends_on:
-      - backend
+      - 9000
 
-  nginx:
-    image: nginx:1.25
-    volumes:
-      - ./nginx:/etc/nginx/
+  redis:
+    image: redis:alpine
     ports:
-      - "9000:80"
-    depends_on:
-      - backend
+      - "6379:6379"
+    restart: unless-stopped
 
-  centrifugo:
-    image: centrifugo/centrifugo:v5.2.0
-    volumes:
-      - ./centrifugo/config.json:/centrifugo/config.json
-    command: centrifugo -c config.json
-    expose:
-      - "8000"
+
+volumes:
+  static_volume:
+  media_volume:
+  dev_db_data:

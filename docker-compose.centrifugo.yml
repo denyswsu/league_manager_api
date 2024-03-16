@@ -1,0 +1,68 @@
+version: "3.9"
+
+services:
+  db:
+    container_name: db
+    image: postgres:15.3-bullseye
+    env_file:
+      - ./env_files/.env.dev
+    volumes:
+      - ./dev_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 3s
+      timeout: 30s
+      retries: 3
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+
+  backend:
+    container_name: backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./env_files/.env.dev
+    entrypoint: ["bash", "/usr/src/backend/entrypoint-dev.sh"]
+    volumes:
+      - ./backend:/usr/src/backend
+    expose:
+      - 8000
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  frontend:
+    container_name: frontend
+    stdin_open: true
+    build: ./frontend
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    expose:
+      - 5173
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:1.25
+    volumes:
+      - ./nginx:/etc/nginx/
+    ports:
+      - "9000:80"
+    depends_on:
+      - backend
+
+  centrifugo:
+    image: centrifugo/centrifugo:v5.2.0
+    volumes:
+      - ./centrifugo/config.json:/centrifugo/config.json
+    command: centrifugo -c config.json
+    expose:
+      - "8000"

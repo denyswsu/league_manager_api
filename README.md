@@ -36,3 +36,10 @@ Owner can also manage the website settings, such as:
 - [ ] Voting functionality (e.g. for the best player of the match, etc.)
 - [ ] Team of the week functionality
 - [ ] Match of the week functionality
+
+
+# Sources:
+- [Django channels basic chat tutorial](https://channels.readthedocs.io/en/latest/tutorial/part_1.html)
+- [How to docker compose both wsgi and asgi servers for the same django project](https://stackoverflow.com/questions/72775881/django-channels-unable-to-connectfind-websocket-after-docker-compose-of-projec)
+- [Nice django channels project example](https://github.com/venueless/venueless/tree/dev/server/venueless)
+- 

@@ -22,7 +22,7 @@ import {
 } from 'centrifuge';
 
 const initialChatState = {
-  rooms: [], // room IDs array for room sorting during rendering. 
+  rooms: [], // room IDs array for room sorting during rendering.
   roomsById: {},
   messagesByRoomId: {}
 };

@@ -30,7 +30,7 @@ const ChatSearch: React.FC<ChatSearchProps> = ({ fetchRoom }) => {
           rooms: [room]
         }
       })
-      setRooms(rooms.map((room: any) => 
+      setRooms(rooms.map((room: any) =>
         room.id === roomId
           ? { ...room, is_member: true }
           : room
@@ -50,7 +50,7 @@ const ChatSearch: React.FC<ChatSearchProps> = ({ fetchRoom }) => {
           roomId: roomId
         }
       })
-      setRooms(rooms.map((room: any) => 
+      setRooms(rooms.map((room: any) =>
         room.id === roomId
           ? { ...room, is_member: false }
           : room
