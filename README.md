@@ -18,16 +18,16 @@ Owner can also manage the website settings, such as:
 - Colors
 - etc.
 
-## TODO:
+## Infra TODO:
 - [x] Dockerize the project
-- [ ] Implement websocket functionality (e.g chat, live scores, etc.)
+- [x] Implement websocket functionality
 - [ ] Add CI/CD
 - [ ] Add tests
 - [ ] Host the project on AWS
 - [ ] Implement basic tenant creation MVP (multi-tenancy)
-- [ ] Implement basic league management functionality
 
-## Extra TODO:
+## Business logic TODO:
+- [ ] Implement basic league management functionality
 - [ ] Team management functionality (admins manage their teams, add players, etc.)
 - [ ] Fantasy League functionality
 - [ ] Betting functionality
@@ -42,4 +42,5 @@ Owner can also manage the website settings, such as:
 - [Django channels basic chat tutorial](https://channels.readthedocs.io/en/latest/tutorial/part_1.html)
 - [How to docker compose both wsgi and asgi servers for the same django project](https://stackoverflow.com/questions/72775881/django-channels-unable-to-connectfind-websocket-after-docker-compose-of-projec)
 - [Nice django channels project example](https://github.com/venueless/venueless/tree/dev/server/venueless)
+- [Centrifugo chat be+fe](https://centrifugal.dev/docs/tutorial/backend)
 - 
