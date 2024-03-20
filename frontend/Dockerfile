@@ -1,13 +1,13 @@
-FROM node:18-slim
+FROM node:20.11
 
-WORKDIR /usr/src/app
+WORKDIR /usr/src/frontend
 
-ENV PATH /usr/src/app/node_modules/.bin:$PATH
+ENV PATH /usr/src/frontend/node_modules/.bin:$PATH
 
-# install and cache app dependencies
-COPY package.json .
-COPY package-lock.json .
-RUN npm ci
+COPY package*.json ./
 
-# start app
+RUN npm install
+
+COPY . .
+
 CMD ["vite", "--host"]

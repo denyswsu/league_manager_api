@@ -22,16 +22,16 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path(
-        "swagger/",
+        "api/swagger/",
         schema_view.with_ui("swagger", cache_timeout=0),
         name="schema-swagger-ui",
     ),
-    path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
+    path("api/redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"),
     path("admin/", admin.site.urls),
     path("api/", include("apps.api.urls", namespace="api")),
-    path("channels_chat/", include("apps.websockets.urls")),
-    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
-    path("", include("django.contrib.auth.urls")),
+    path("api/channels_chat/", include("apps.websockets.urls")),
+    path("api/auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path("django/", include("django.contrib.auth.urls")),
 ]
 
 if settings.DEBUG:

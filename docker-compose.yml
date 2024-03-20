@@ -13,6 +13,7 @@ services:
     depends_on:
       - wsgiserver
       - asgiserver
+      - frontend
 
   db:
     container_name: db
@@ -41,8 +42,8 @@ services:
       - ./env_files/.env.dev
     volumes:
       - ./backend:/usr/src/backend
-      - static_volume:/usr/src/app/staticfiles/
-      - media_volume:/usr/src/app/media/
+      - static_volume:/usr/src/backend/staticfiles/
+      - media_volume:/usr/src/backend/media/
     links:
       - db
       - redis
@@ -70,6 +71,25 @@ services:
     ports:
       - "6379:6379"
     restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    stdin_open: true
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    expose:
+      - 5173
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - wsgiserver
+      - asgiserver
 
 
 volumes:
