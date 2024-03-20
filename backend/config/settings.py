@@ -46,8 +46,7 @@ INSTALLED_APPS = [
     "channels",
     # project apps
     "users",
-    "chat",
-    "channels_chat",
+    "websockets",
 ]
 
 MIDDLEWARE = [

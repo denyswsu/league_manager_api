@@ -1,6 +1,6 @@
 import os
 
-from apps.channels_chat.routing import websocket_urlpatterns
+from apps.websockets.routing import websocket_urlpatterns
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator

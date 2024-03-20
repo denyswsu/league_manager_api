@@ -4,7 +4,6 @@ from django.urls import include, path
 app_name = "api"
 urlpatterns = [
     path("", include("apps.users.urls")),
-    path("", include("apps.chat.urls")),
     path("csrf/", users_views.get_csrf, name="api-csrf"),
     path(
         "token/connection/",
